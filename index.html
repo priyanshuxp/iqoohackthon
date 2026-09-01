@@ -1,0 +1,2515 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PatchPilot — iQOO Hackathon</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+
+:root{
+  --ink:#101217;
+  --muted:#68707d;
+  --line:#e3e7ed;
+  --soft:#f6f8fa;
+
+  --blue:#155eef;
+  --blue-soft:#edf3ff;
+
+  --green:#0b8f61;
+  --green-soft:#eaf8f2;
+
+  --red:#d94149;
+  --red-soft:#fff0f1;
+
+  --shadow:0 25px 70px rgba(16,18,23,.13);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:#dfe3e8;
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+}
+
+button{
+  font:inherit;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.topbar{
+  position:fixed;
+  z-index:100;
+
+  top:18px;
+  left:50%;
+
+  transform:translateX(-50%);
+
+  width:min(1180px,calc(100% - 32px));
+  height:52px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:0 9px 0 18px;
+
+  background:rgba(255,255,255,.94);
+
+  border:1px solid #dfe3e8;
+  border-radius:999px;
+
+  backdrop-filter:blur(18px);
+
+  box-shadow:
+    0 10px 30px rgba(16,18,23,.08);
+}
+
+.brand{
+  font-weight:800;
+  letter-spacing:-.05em;
+}
+
+.brand b{
+  color:var(--blue);
+}
+
+.dots{
+  display:flex;
+  gap:5px;
+}
+
+.dots button{
+  width:31px;
+  height:31px;
+
+  border:0;
+  border-radius:50%;
+
+  background:transparent;
+  color:#9299a4;
+
+  font:
+    700 9px "JetBrains Mono",
+    monospace;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.dots button:hover{
+  background:#eef1f5;
+  color:#111318;
+}
+
+.dots button.active{
+  background:#111318;
+  color:#fff;
+
+  transform:scale(1.05);
+}
+
+/* =========================================================
+   SLIDE SYSTEM
+========================================================= */
+
+.deck{
+  width:100%;
+}
+
+.slide{
+  width:100%;
+
+  /*
+    Each slide occupies the viewport,
+    but NOTHING forces the browser to snap.
+  */
+  min-height:100svh;
+
+  padding:100px 6vw 55px;
+
+  display:flex;
+  align-items:center;
+
+  position:relative;
+
+  overflow:hidden;
+
+  background:#fff;
+
+  /*
+    Strong visual separation.
+  */
+  border-bottom:10px solid #dfe3e8;
+}
+
+/* subtle alternating background */
+
+.slide:nth-child(even){
+  background:#fafbfc;
+}
+
+/* subtle blue top accent */
+
+.slide::before{
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:0;
+
+  width:100%;
+  height:3px;
+
+  background:var(--blue);
+
+  opacity:.08;
+}
+
+.inner{
+  width:min(1180px,100%);
+  margin:auto;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.eyebrow{
+  margin-bottom:18px;
+
+  color:var(--blue);
+
+  font:
+    700 10px "JetBrains Mono",
+    monospace;
+
+  letter-spacing:.13em;
+
+  text-transform:uppercase;
+}
+
+.eyebrow::before{
+  content:"";
+
+  display:inline-block;
+
+  width:22px;
+  height:2px;
+
+  margin-right:9px;
+
+  background:var(--blue);
+
+  vertical-align:middle;
+}
+
+h1,
+h2,
+h3,
+p{
+  margin-top:0;
+}
+
+h1{
+  margin-bottom:26px;
+
+  font-size:clamp(64px,8vw,108px);
+  line-height:.88;
+
+  letter-spacing:-.075em;
+}
+
+h2{
+  margin-bottom:18px;
+
+  font-size:clamp(44px,5.7vw,72px);
+  line-height:.92;
+
+  letter-spacing:-.065em;
+}
+
+h3{
+  font-size:18px;
+
+  letter-spacing:-.025em;
+}
+
+.lead{
+  max-width:680px;
+
+  color:var(--muted);
+
+  font-size:clamp(16px,1.65vw,20px);
+  line-height:1.55;
+}
+
+.quote{
+  max-width:700px;
+
+  margin:30px 0;
+
+  padding-left:18px;
+
+  border-left:3px solid var(--blue);
+
+  font-size:clamp(18px,2vw,24px);
+  font-weight:650;
+
+  letter-spacing:-.025em;
+}
+
+/* =========================================================
+   GENERAL GRID
+========================================================= */
+
+.grid{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:clamp(50px,7vw,100px);
+
+  align-items:center;
+}
+
+.wide-left{
+  grid-template-columns:1.12fr .88fr;
+}
+
+.wide-right{
+  grid-template-columns:.86fr 1.14fr;
+}
+
+/* =========================================================
+   PHONE MOCKUP
+========================================================= */
+
+.phone-wrap{
+  display:flex;
+
+  justify-content:center;
+  align-items:center;
+}
+
+.phone{
+  width:310px;
+  height:630px;
+
+  padding:9px;
+
+  position:relative;
+
+  background:#101217;
+
+  border-radius:43px;
+
+  box-shadow:var(--shadow);
+}
+
+.phone::before{
+  content:"";
+
+  position:absolute;
+
+  z-index:5;
+
+  top:10px;
+  left:50%;
+
+  width:92px;
+  height:24px;
+
+  transform:translateX(-50%);
+
+  background:#090a0d;
+
+  border-radius:0 0 16px 16px;
+}
+
+.screen{
+  height:100%;
+
+  overflow:hidden;
+
+  background:#f7f8fa;
+
+  border-radius:35px;
+}
+
+.status{
+  height:47px;
+
+  padding:19px 18px 0;
+
+  display:flex;
+  justify-content:space-between;
+
+  font-size:9px;
+  font-weight:800;
+}
+
+.appbar{
+  padding:13px 17px 15px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.appname{
+  font-size:16px;
+  font-weight:800;
+
+  letter-spacing:-.04em;
+}
+
+.appname span{
+  color:var(--blue);
+}
+
+.avatar{
+  width:28px;
+  height:28px;
+
+  border-radius:50%;
+
+  background:#e5e8ee;
+}
+
+.screen-body{
+  padding:0 14px 18px;
+}
+
+.pcard{
+  margin-bottom:9px;
+
+  padding:14px;
+
+  background:#fff;
+
+  border:1px solid #e6e8ed;
+  border-radius:16px;
+
+  box-shadow:
+    0 4px 14px rgba(16,18,23,.035);
+}
+
+.label{
+  color:#7b828e;
+
+  font:
+    700 8px "JetBrains Mono",
+    monospace;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+}
+
+.ptitle{
+  margin:6px 0 9px;
+
+  font-size:13px;
+  font-weight:800;
+
+  letter-spacing:-.02em;
+}
+
+.psmall{
+  color:var(--muted);
+
+  font-size:9px;
+  line-height:1.5;
+}
+
+.pill{
+  display:inline-flex;
+
+  padding:5px 8px;
+
+  border-radius:99px;
+
+  font-size:8px;
+  font-weight:800;
+}
+
+.red{
+  background:var(--red-soft);
+  color:var(--red);
+}
+
+.blue{
+  background:var(--blue-soft);
+  color:var(--blue);
+}
+
+.green{
+  background:var(--green-soft);
+  color:var(--green);
+}
+
+.code{
+  padding:10px;
+
+  overflow:hidden;
+
+  background:#15181d;
+  color:#d9dee7;
+
+  border-radius:11px;
+
+  font:
+    500 7.7px/1.7 "JetBrains Mono",
+    monospace;
+}
+
+.code .minus{
+  color:#ff9292;
+}
+
+.code .plus{
+  color:#79dbb1;
+}
+
+.code .dim{
+  color:#78818f;
+}
+
+.btn{
+  width:100%;
+
+  margin-top:8px;
+  padding:10px;
+
+  border:0;
+  border-radius:11px;
+
+  background:var(--blue);
+  color:#fff;
+
+  font-size:9px;
+  font-weight:800;
+}
+
+.btn.secondary{
+  background:#eef0f3;
+  color:#20242b;
+}
+
+/* =========================================================
+   SLIDE 1
+========================================================= */
+
+.flow5{
+  display:grid;
+
+  grid-template-columns:repeat(5,1fr);
+
+  gap:8px;
+
+  margin-top:28px;
+}
+
+.flow5 div{
+  padding:12px;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+  border-radius:13px;
+
+  font-size:10px;
+  font-weight:800;
+}
+
+.flow5 b{
+  display:block;
+
+  margin-bottom:7px;
+
+  color:#a0a5ae;
+
+  font:
+    500 9px "JetBrains Mono",
+    monospace;
+}
+
+/* =========================================================
+   SLIDE 2
+========================================================= */
+
+.problem-canvas{
+  padding:28px;
+
+  background:#f7f8fa;
+
+  border:1px solid var(--line);
+  border-radius:28px;
+
+  box-shadow:
+    0 15px 40px rgba(16,18,23,.04);
+}
+
+.cycle{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:10px;
+}
+
+.cycle-card{
+  min-height:105px;
+
+  padding:16px;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+  border-radius:17px;
+}
+
+.cycle-card .icon{
+  margin-bottom:12px;
+
+  font-size:20px;
+}
+
+.cycle-card strong{
+  display:block;
+
+  margin-bottom:5px;
+
+  font-size:12px;
+}
+
+.cycle-card span{
+  color:var(--muted);
+
+  font-size:9px;
+  line-height:1.45;
+}
+
+.cycle-center{
+  grid-column:1/-1;
+
+  padding:18px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:#111318;
+  color:#fff;
+
+  border-radius:18px;
+}
+
+.cycle-center strong{
+  font-size:13px;
+}
+
+.cycle-center span{
+  color:#aeb4be;
+
+  font-size:9px;
+}
+
+.problem-points{
+  display:grid;
+
+  gap:11px;
+
+  margin-top:23px;
+}
+
+.point{
+  display:flex;
+
+  gap:12px;
+
+  align-items:flex-start;
+}
+
+.point i{
+  width:27px;
+  height:27px;
+
+  flex:none;
+
+  display:grid;
+  place-items:center;
+
+  background:#f0f2f5;
+
+  border-radius:9px;
+
+  font:
+    700 9px "JetBrains Mono",
+    monospace;
+
+  font-style:normal;
+}
+
+.point b{
+  font-size:12px;
+}
+
+.point span{
+  display:block;
+
+  margin-top:3px;
+
+  color:var(--muted);
+
+  font-size:10px;
+  line-height:1.4;
+}
+
+/* =========================================================
+   SLIDE 3
+========================================================= */
+
+.workflow{
+  display:grid;
+
+  grid-template-columns:repeat(4,1fr);
+
+  gap:10px;
+
+  margin-top:27px;
+}
+
+.wcard{
+  min-height:130px;
+
+  padding:16px;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+  border-radius:17px;
+}
+
+.wcard:nth-child(5){
+  grid-column:1/2;
+}
+
+.wcard:nth-child(6){
+  grid-column:2/3;
+}
+
+.wcard:nth-child(7){
+  grid-column:3/5;
+}
+
+.wcard .n{
+  margin-bottom:16px;
+
+  color:var(--blue);
+
+  font:
+    700 9px "JetBrains Mono",
+    monospace;
+}
+
+.wcard strong{
+  display:block;
+
+  margin-bottom:6px;
+
+  font-size:12px;
+}
+
+.wcard span{
+  color:var(--muted);
+
+  font-size:9px;
+  line-height:1.45;
+}
+
+.solution-note{
+  margin-top:17px;
+
+  padding:13px 15px;
+
+  display:flex;
+  align-items:center;
+
+  gap:10px;
+
+  background:#f4f7ff;
+
+  border:1px solid #dbe6ff;
+  border-radius:15px;
+
+  color:#234787;
+
+  font-size:11px;
+  font-weight:750;
+}
+
+/* =========================================================
+   SLIDE 4
+========================================================= */
+
+.compare{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:15px;
+
+  margin-top:30px;
+}
+
+.comp{
+  padding:21px;
+
+  border:1px solid var(--line);
+  border-radius:23px;
+}
+
+.comp.feature{
+  background:#f7faff;
+
+  border-color:#cbdcff;
+}
+
+.comp h3{
+  margin-bottom:16px;
+}
+
+.comp-item{
+  display:flex;
+
+  gap:10px;
+
+  align-items:center;
+
+  padding:11px 0;
+
+  border-bottom:1px solid var(--line);
+
+  font-size:11px;
+  font-weight:650;
+}
+
+.comp-item:last-child{
+  border-bottom:0;
+}
+
+.comp-item em{
+  color:#a0a5ae;
+
+  font:
+    700 9px "JetBrains Mono",
+    monospace;
+
+  font-style:normal;
+}
+
+.feature .comp-item em{
+  color:var(--blue);
+}
+
+.highlights{
+  display:grid;
+
+  grid-template-columns:repeat(4,1fr);
+
+  gap:10px;
+
+  margin-top:18px;
+}
+
+.highlight{
+  padding:13px;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+  border-radius:15px;
+}
+
+.highlight strong{
+  display:block;
+
+  margin-bottom:5px;
+
+  font-size:10px;
+}
+
+.highlight span{
+  color:var(--muted);
+
+  font-size:9px;
+  line-height:1.45;
+}
+
+/* =========================================================
+   SLIDE 5
+========================================================= */
+
+.vision{
+  display:grid;
+
+  grid-template-columns:.88fr 1.12fr;
+
+  gap:80px;
+
+  align-items:center;
+}
+
+.pipeline-card{
+  padding:23px;
+
+  background:#f7f8fa;
+
+  border:1px solid var(--line);
+  border-radius:28px;
+}
+
+.pipeline{
+  position:relative;
+
+  display:grid;
+
+  gap:4px;
+}
+
+.pipeline::before{
+  content:"";
+
+  position:absolute;
+
+  left:20px;
+  top:20px;
+  bottom:20px;
+
+  width:1px;
+
+  background:#d7dbe1;
+}
+
+.pipe{
+  min-height:53px;
+
+  display:grid;
+
+  grid-template-columns:41px 1fr;
+
+  gap:13px;
+
+  align-items:center;
+
+  position:relative;
+}
+
+.pipe .ico{
+  z-index:1;
+
+  width:41px;
+  height:41px;
+
+  display:grid;
+  place-items:center;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+  border-radius:13px;
+
+  font-size:13px;
+}
+
+.pipe strong{
+  font-size:11px;
+}
+
+.pipe small{
+  display:block;
+
+  margin-top:2px;
+
+  color:var(--muted);
+
+  font-size:8px;
+}
+
+.outcome{
+  margin-top:20px;
+
+  padding:17px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:#111318;
+  color:#fff;
+
+  border-radius:19px;
+}
+
+.outcome strong{
+  font-size:13px;
+}
+
+.outcome span{
+  color:#9ebcff;
+
+  font:
+    700 9px "JetBrains Mono",
+    monospace;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+.reveal{
+  opacity:0;
+
+  transform:translateY(18px);
+
+  transition:
+    opacity .55s ease,
+    transform .55s ease;
+}
+
+.slide.visible .reveal{
+  opacity:1;
+
+  transform:none;
+}
+
+.slide.visible .reveal:nth-child(2){
+  transition-delay:.06s;
+}
+
+.slide.visible .reveal:nth-child(3){
+  transition-delay:.12s;
+}
+
+.slide.visible .reveal:nth-child(4){
+  transition-delay:.18s;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:900px){
+
+  body{
+    background:#fff;
+  }
+
+  .slide{
+    height:auto;
+
+    min-height:100svh;
+
+    padding:92px 20px 55px;
+
+    border-bottom:8px solid #dfe3e8;
+  }
+
+  .grid,
+  .wide-left,
+  .wide-right,
+  .vision{
+    grid-template-columns:1fr;
+
+    gap:30px;
+  }
+
+  .phone-wrap{
+    order:-1;
+  }
+
+  .phone{
+    width:285px;
+    height:590px;
+  }
+
+  h1{
+    font-size:clamp(58px,17vw,88px);
+  }
+
+  .flow5{
+    grid-template-columns:1fr;
+  }
+
+  .flow5 div{
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+  }
+
+  .flow5 b{
+    margin:0;
+  }
+
+  .cycle{
+    grid-template-columns:1fr;
+  }
+
+  .cycle-center{
+    grid-column:auto;
+  }
+
+  .workflow{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .wcard:nth-child(5),
+  .wcard:nth-child(6),
+  .wcard:nth-child(7){
+    grid-column:auto;
+  }
+
+  .compare{
+    grid-template-columns:1fr;
+  }
+
+  .highlights{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:520px){
+
+  .topbar{
+    height:48px;
+  }
+
+  .dots button{
+    width:27px;
+    height:27px;
+  }
+
+  .phone{
+    width:270px;
+    height:565px;
+  }
+
+  .problem-canvas,
+  .pipeline-card{
+    padding:17px;
+
+    border-radius:20px;
+  }
+
+  .workflow{
+    grid-template-columns:1fr;
+  }
+
+  .highlights{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+  @page{
+    size:landscape;
+    margin:0;
+  }
+
+  body{
+    background:#fff;
+  }
+
+  .topbar{
+    display:none;
+  }
+
+  .slide{
+    height:100vh;
+    min-height:100vh;
+
+    padding:45px 60px;
+
+    border:0;
+
+    page-break-after:always;
+    break-after:page;
+  }
+
+  .slide:last-child{
+    page-break-after:auto;
+    break-after:auto;
+  }
+
+  .reveal{
+    opacity:1;
+    transform:none;
+  }
+
+  .phone{
+    box-shadow:none;
+  }
+}
+</style>
+</head>
+
+
+<body>
+
+<!-- =========================================================
+     TOP NAVIGATION
+========================================================= -->
+
+<nav class="topbar">
+
+  <div class="brand">
+    Patch<b>Pilot</b>
+  </div>
+
+  <div class="dots">
+
+    <button class="active" data-go="0">01</button>
+    <button data-go="1">02</button>
+    <button data-go="2">03</button>
+    <button data-go="3">04</button>
+    <button data-go="4">05</button>
+
+  </div>
+
+</nav>
+
+
+<main class="deck">
+
+
+<!-- =========================================================
+     SLIDE 1 — COVER
+========================================================= -->
+
+<section class="slide visible" id="s1">
+
+  <div class="inner grid wide-left">
+
+    <div>
+
+      <div class="eyebrow reveal">
+        iQOO Hackathon · Developer Experience
+      </div>
+
+      <h1 class="reveal">
+        Patch<br>
+        <span style="color:var(--blue)">Pilot.</span>
+      </h1>
+
+      <p class="lead reveal">
+        AI-powered deployment repair for developers.
+        Turn a failed deployment into a focused,
+        reviewable fix.
+      </p>
+
+      <div class="quote reveal">
+        “Turn failed deployments into actionable fixes.”
+      </div>
+
+      <div class="flow5 reveal">
+
+        <div>
+          <b>01</b>
+          Failure
+        </div>
+
+        <div>
+          <b>02</b>
+          Diagnose
+        </div>
+
+        <div>
+          <b>03</b>
+          Patch
+        </div>
+
+        <div>
+          <b>04</b>
+          Approve
+        </div>
+
+        <div>
+          <b>05</b>
+          Deploy
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="phone-wrap reveal">
+
+      <div class="phone">
+
+        <div class="screen">
+
+          <div class="status">
+            <span>9:41</span>
+            <span>● ● ▰</span>
+          </div>
+
+          <div class="appbar">
+
+            <div class="appname">
+              Patch<span>Pilot</span>
+            </div>
+
+            <div class="avatar"></div>
+
+          </div>
+
+          <div class="screen-body">
+
+            <div class="pcard">
+
+              <div class="label">
+                Deployment #1842
+              </div>
+
+              <div class="ptitle">
+                Build failed
+              </div>
+
+              <span class="pill red">
+                Needs attention
+              </span>
+
+            </div>
+
+
+            <div class="pcard">
+
+              <div class="label">
+                PatchPilot found
+              </div>
+
+              <div class="ptitle">
+                A likely configuration issue
+              </div>
+
+              <p class="psmall">
+                The relevant project area has been isolated
+                so you can review a focused fix.
+              </p>
+
+            </div>
+
+
+            <div class="pcard">
+
+              <div class="label">
+                Suggested change
+              </div>
+
+              <div class="code">
+                <span class="dim">
+                  config/app.js
+                </span>
+                <br>
+
+                <span class="minus">
+                  − API_URL: undefined
+                </span>
+                <br>
+
+                <span class="plus">
+                  + API_URL: env.API_URL
+                </span>
+              </div>
+
+              <button class="btn">
+                Review fix
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SLIDE 2 — PROBLEM
+========================================================= -->
+
+<section class="slide" id="s2">
+
+  <div class="inner grid">
+
+    <div>
+
+      <div class="eyebrow reveal">
+        The friction
+      </div>
+
+      <h2 class="reveal">
+        The<br>
+        Problem
+      </h2>
+
+      <p class="lead reveal">
+        A failed deployment creates a debugging journey
+        that pulls developers away from building.
+      </p>
+
+      <div class="problem-points reveal">
+
+        <div class="point">
+
+          <i>01</i>
+
+          <div>
+
+            <b>Logs are noisy</b>
+
+            <span>
+              Useful signals are buried inside long
+              deployment output.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="point">
+
+          <i>02</i>
+
+          <div>
+
+            <b>Context is hard to find</b>
+
+            <span>
+              Developers search across a growing codebase
+              to locate the relevant area.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="point">
+
+          <i>03</i>
+
+          <div>
+
+            <b>The patch is still manual</b>
+
+            <span>
+              Someone must decide what to change,
+              make the edit, and prepare another deployment.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="problem-canvas reveal">
+
+      <div class="cycle">
+
+        <div class="cycle-card">
+
+          <div class="icon">⚠</div>
+
+          <strong>
+            Deployment fails
+          </strong>
+
+          <span>
+            The delivery loop stops.
+          </span>
+
+        </div>
+
+
+        <div class="cycle-card">
+
+          <div class="icon">≋</div>
+
+          <strong>
+            Read the logs
+          </strong>
+
+          <span>
+            Noise makes the signal harder to isolate.
+          </span>
+
+        </div>
+
+
+        <div class="cycle-card">
+
+          <div class="icon">⌕</div>
+
+          <strong>
+            Find the source
+          </strong>
+
+          <span>
+            Search through files and dependencies.
+          </span>
+
+        </div>
+
+
+        <div class="cycle-card">
+
+          <div class="icon">✎</div>
+
+          <strong>
+            Write the fix
+          </strong>
+
+          <span>
+            Turn diagnosis into a safe code change.
+          </span>
+
+        </div>
+
+
+        <div class="cycle-center">
+
+          <strong>
+            Deploy again
+          </strong>
+
+          <span>
+            …and hope the issue is actually resolved.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <p class="psmall" style="margin-top:18px">
+
+        The problem isn't a lack of logs.
+        It's the gap between a failure signal
+        and an actionable code change.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SLIDE 3 — SOLUTION
+========================================================= -->
+
+<section class="slide" id="s3">
+
+  <div class="inner grid wide-right">
+
+    <div>
+
+      <div class="eyebrow reveal">
+        The repair loop
+      </div>
+
+      <h2 class="reveal">
+        The<br>
+        Solution
+      </h2>
+
+      <p class="lead reveal">
+        PatchPilot turns deployment recovery into one
+        guided workflow — from failure signal to an
+        approved GitHub update.
+      </p>
+
+
+      <div class="workflow reveal">
+
+        <div class="wcard">
+
+          <div class="n">
+            01
+          </div>
+
+          <strong>
+            Connect repository
+          </strong>
+
+          <span>
+            Bring the GitHub project into the workflow.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            02
+          </div>
+
+          <strong>
+            Provide the error
+          </strong>
+
+          <span>
+            Give PatchPilot the deployment failure.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            03
+          </div>
+
+          <strong>
+            Locate relevant code
+          </strong>
+
+          <span>
+            Focus the investigation on the likely source.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            04
+          </div>
+
+          <strong>
+            Generate a fix
+          </strong>
+
+          <span>
+            Produce a targeted, understandable patch.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            05
+          </div>
+
+          <strong>
+            Review changes
+          </strong>
+
+          <span>
+            See exactly what will be modified.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            06
+          </div>
+
+          <strong>
+            Approve update
+          </strong>
+
+          <span>
+            Developer decides whether to proceed.
+          </span>
+
+        </div>
+
+
+        <div class="wcard">
+
+          <div class="n">
+            07
+          </div>
+
+          <strong>
+            Deploy again
+          </strong>
+
+          <span>
+            Return the project to the delivery loop.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="solution-note reveal">
+
+        ✓
+
+        AI finds the problem.
+        Developers stay in control.
+
+      </div>
+
+    </div>
+
+
+    <div class="phone-wrap reveal">
+
+      <div class="phone">
+
+        <div class="screen">
+
+          <div class="status">
+            <span>9:41</span>
+            <span>● ● ▰</span>
+          </div>
+
+          <div class="appbar">
+
+            <div class="appname">
+              Review <span>fix</span>
+            </div>
+
+            <div class="avatar"></div>
+
+          </div>
+
+
+          <div class="screen-body">
+
+            <div class="pcard">
+
+              <div class="label">
+                Analysis complete
+              </div>
+
+              <div class="ptitle">
+                Fix ready to review
+              </div>
+
+              <span class="pill green">
+                Ready
+              </span>
+
+            </div>
+
+
+            <div class="pcard">
+
+              <div class="label">
+                Likely cause
+              </div>
+
+              <div class="ptitle">
+                Configuration is read before initialization
+              </div>
+
+              <p class="psmall">
+                PatchPilot narrowed the issue to the
+                relevant project area.
+              </p>
+
+            </div>
+
+
+            <div class="pcard">
+
+              <div class="label">
+                Proposed patch
+              </div>
+
+              <div class="code">
+
+                <span class="dim">
+                  src/config.ts
+                </span>
+                <br>
+
+                <span class="minus">
+                  − const url = config.url
+                </span>
+                <br>
+
+                <span class="plus">
+                  + const url = config?.url
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div class="pcard">
+
+              <div class="label">
+                Your decision
+              </div>
+
+              <button class="btn">
+                Approve &amp; update GitHub
+              </button>
+
+              <button class="btn secondary">
+                Reject suggestion
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SLIDE 4 — WHY PATCHPILOT
+========================================================= -->
+
+<section class="slide" id="s4">
+
+  <div class="inner">
+
+    <div class="eyebrow reveal">
+      Built for real repositories
+    </div>
+
+    <h2 class="reveal">
+      Why<br>
+      PatchPilot
+    </h2>
+
+    <p class="lead reveal">
+      The difference is not “more AI”.
+      It is a better debugging experience:
+      start with the failure, focus the context,
+      and make the developer the final decision-maker.
+    </p>
+
+
+    <div class="compare reveal">
+
+      <div class="comp">
+
+        <h3>
+          Traditional AI debugging
+        </h3>
+
+        <div class="comp-item">
+          <em>01</em>
+          Large repository as input
+        </div>
+
+        <div class="comp-item">
+          <em>02</em>
+          Too much surrounding context
+        </div>
+
+        <div class="comp-item">
+          <em>03</em>
+          Harder to isolate the cause
+        </div>
+
+        <div class="comp-item">
+          <em>04</em>
+          Longer path to a useful change
+        </div>
+
+      </div>
+
+
+      <div class="comp feature">
+
+        <h3>
+          PatchPilot
+        </h3>
+
+        <div class="comp-item">
+          <em>01</em>
+          Deployment failure as the signal
+        </div>
+
+        <div class="comp-item">
+          <em>02</em>
+          Relevant code is brought forward
+        </div>
+
+        <div class="comp-item">
+          <em>03</em>
+          Focused diagnosis and patch
+        </div>
+
+        <div class="comp-item">
+          <em>04</em>
+          Developer reviews before update
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="highlights reveal">
+
+      <div class="highlight">
+
+        <strong>
+          Less unnecessary context
+        </strong>
+
+        <span>
+          Investigate what matters instead of treating
+          the entire repository as equally relevant.
+        </span>
+
+      </div>
+
+
+      <div class="highlight">
+
+        <strong>
+          Faster diagnosis
+        </strong>
+
+        <span>
+          Move from a deployment error to a likely
+          root cause with less manual searching.
+        </span>
+
+      </div>
+
+
+      <div class="highlight">
+
+        <strong>
+          Focused changes
+        </strong>
+
+        <span>
+          Present the developer with a clear,
+          reviewable patch.
+        </span>
+
+      </div>
+
+
+      <div class="highlight">
+
+        <strong>
+          Human approval
+        </strong>
+
+        <span>
+          No silent edits. The developer decides
+          whether the fix should land.
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================================================
+     SLIDE 5 — VISION
+========================================================= -->
+
+<section class="slide" id="s5">
+
+  <div class="inner vision">
+
+    <div>
+
+      <div class="eyebrow reveal">
+        The outcome
+      </div>
+
+      <h2 class="reveal">
+
+        From failure<br>
+
+        to
+
+        <span style="color:var(--blue)">
+          verified fix.
+        </span>
+
+      </h2>
+
+      <p class="lead reveal">
+
+        PatchPilot compresses the painful middle
+        of deployment recovery into a clear,
+        controlled loop.
+
+      </p>
+
+
+      <div class="outcome reveal">
+
+        <strong>
+          Failure becomes progress.
+        </strong>
+
+        <span>
+          RECOVER → SHIP
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="pipeline-card reveal">
+
+      <div class="pipeline">
+
+        <div class="pipe">
+
+          <div class="ico">
+            ✕
+          </div>
+
+          <div>
+            <strong>
+              Deployment Failed
+            </strong>
+
+            <small>
+              The delivery loop stops
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ◈
+          </div>
+
+          <div>
+            <strong>
+              PatchPilot
+            </strong>
+
+            <small>
+              Understands the failure signal
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ⌕
+          </div>
+
+          <div>
+            <strong>
+              Root Cause
+            </strong>
+
+            <small>
+              Relevant problem is isolated
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ⌘
+          </div>
+
+          <div>
+            <strong>
+              Code Changes
+            </strong>
+
+            <small>
+              A focused patch is generated
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ✓
+          </div>
+
+          <div>
+            <strong>
+              Developer Approval
+            </strong>
+
+            <small>
+              Human stays in control
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ↗
+          </div>
+
+          <div>
+            <strong>
+              GitHub Update
+            </strong>
+
+            <small>
+              Project is ready for another deployment
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            🚀
+          </div>
+
+          <div>
+            <strong>
+              Deploy Again
+            </strong>
+
+            <small>
+              Return to delivery
+            </small>
+          </div>
+
+        </div>
+
+
+        <div class="pipe">
+
+          <div class="ico">
+            ✓
+          </div>
+
+          <div>
+            <strong>
+              Fixed
+            </strong>
+
+            <small>
+              Failure becomes a verified next step
+            </small>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<script>
+(() => {
+
+  const slides =
+    [...document.querySelectorAll('.slide')];
+
+  const buttons =
+    [...document.querySelectorAll('.dots button')];
+
+  let currentIndex = 0;
+
+  let isNavigating = false;
+
+  let navigationTimer = null;
+
+
+  /* =======================================================
+     ACTIVE SLIDE
+  ======================================================= */
+
+  function activate(index){
+
+    if(
+      index < 0 ||
+      index >= slides.length
+    ){
+      return;
+    }
+
+    currentIndex = index;
+
+    buttons.forEach((button,i) => {
+
+      button.classList.toggle(
+        'active',
+        i === index
+      );
+
+    });
+
+    slides.forEach((slide,i) => {
+
+      slide.classList.toggle(
+        'visible',
+        i === index
+      );
+
+    });
+
+  }
+
+
+  /* =======================================================
+     DIRECT NAVIGATION
+     
+     Clicking 03 immediately activates 03.
+     IntersectionObserver is temporarily ignored so
+     slide 02 cannot flash active during the animation.
+  ======================================================= */
+
+  function goTo(index){
+
+    if(
+      index < 0 ||
+      index >= slides.length
+    ){
+      return;
+    }
+
+    clearTimeout(navigationTimer);
+
+    isNavigating = true;
+
+    activate(index);
+
+    slides[index].scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+
+    /*
+      Short lock only for programmatic navigation.
+      Normal wheel/trackpad/touch scrolling remains
+      completely unrestricted.
+    */
+
+    navigationTimer =
+      setTimeout(() => {
+
+        isNavigating = false;
+
+        activate(index);
+
+      },900);
+
+  }
+
+
+  /* =======================================================
+     NAV BUTTONS
+  ======================================================= */
+
+  buttons.forEach((button,index) => {
+
+    button.addEventListener(
+      'click',
+      () => goTo(index)
+    );
+
+  });
+
+
+  /* =======================================================
+     FREE SCROLL DETECTION
+     
+     IMPORTANT:
+     There is NO scroll snapping anywhere.
+     
+     This observer only detects which slide is
+     currently most visible while the user scrolls.
+  ======================================================= */
+
+  const observer =
+    new IntersectionObserver(
+      entries => {
+
+        if(isNavigating){
+          return;
+        }
+
+        const visible =
+          entries
+            .filter(
+              entry =>
+                entry.isIntersecting
+            )
+            .sort(
+              (a,b) =>
+                b.intersectionRatio -
+                a.intersectionRatio
+            );
+
+        if(!visible.length){
+          return;
+        }
+
+        const index =
+          slides.indexOf(
+            visible[0].target
+          );
+
+        if(index !== -1){
+          activate(index);
+        }
+
+      },
+      {
+        threshold:[
+          .35,
+          .5,
+          .65,
+          .8
+        ]
+      }
+    );
+
+
+  slides.forEach(slide => {
+    observer.observe(slide);
+  });
+
+
+  /* =======================================================
+     KEYBOARD
+     
+     Arrow keys intentionally move to slides.
+     Mouse / trackpad / touch remain free.
+  ======================================================= */
+
+  document.addEventListener(
+    'keydown',
+    event => {
+
+      if(
+        event.key === 'ArrowRight' ||
+        event.key === 'ArrowDown' ||
+        event.key === 'PageDown' ||
+        event.key === ' '
+      ){
+
+        event.preventDefault();
+
+        goTo(
+          Math.min(
+            slides.length - 1,
+            currentIndex + 1
+          )
+        );
+
+        return;
+      }
+
+
+      if(
+        event.key === 'ArrowLeft' ||
+        event.key === 'ArrowUp' ||
+        event.key === 'PageUp'
+      ){
+
+        event.preventDefault();
+
+        goTo(
+          Math.max(
+            0,
+            currentIndex - 1
+          )
+        );
+
+        return;
+      }
+
+
+      if(event.key === 'Home'){
+
+        event.preventDefault();
+
+        goTo(0);
+
+        return;
+      }
+
+
+      if(event.key === 'End'){
+
+        event.preventDefault();
+
+        goTo(
+          slides.length - 1
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =======================================================
+     TOUCH
+     
+     A deliberate swipe moves between slides.
+     Normal touch scrolling is otherwise unrestricted.
+  ======================================================= */
+
+  let touchStartY = 0;
+
+  document.addEventListener(
+    'touchstart',
+    event => {
+
+      touchStartY =
+        event.changedTouches[0].screenY;
+
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  document.addEventListener(
+    'touchend',
+    event => {
+
+      const touchEndY =
+        event.changedTouches[0].screenY;
+
+      const distance =
+        touchStartY - touchEndY;
+
+      if(Math.abs(distance) < 60){
+        return;
+      }
+
+      if(distance > 0){
+
+        goTo(
+          Math.min(
+            slides.length - 1,
+            currentIndex + 1
+          )
+        );
+
+      }else{
+
+        goTo(
+          Math.max(
+            0,
+            currentIndex - 1
+          )
+        );
+
+      }
+
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  /* =======================================================
+     INITIAL STATE
+  ======================================================= */
+
+  activate(0);
+
+})();
+</script>
+
+</body>
+</html>
